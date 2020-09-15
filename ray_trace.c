@@ -46,7 +46,7 @@ internal float3 ray_color(ray const *r, hittable const *world, i32 depth)
     }  
 	 	
 	float3 unit_direction = normalize(r->dir);
-    f32 t = 0.5f*(unit_direction.y + 1.0f);
+    float t = 0.5f*(unit_direction.y + 1.0f);
     return (1.0f-t)*(float3){1.0f, 1.0f, 1.0f} + t*(float3){0.5f, 0.7f, 1.0f};	
 }
 
@@ -54,7 +54,7 @@ internal hittable *random_scene(void)
 {
 	hittable *world = new_hittable_list();
 
-	auto material_ground = new_lambertian((float3){0.5f, 0.5f, 0.5f});
+	material *material_ground = new_lambertian((float3){0.5f, 0.5f, 0.5f});
 	hittable_list_add(world, new_sphere((float3){0, -1000, -1}, 1000, material_ground));
 
 	for(i32 a = -11; a < 11; ++a)
@@ -158,68 +158,58 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Error: with SDL2 initialization \"%s\"\n", SDL_GetError());
 		return -1;
 	}
-	else
+
+	SDL_Window *window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
+	if(NULL == window)
 	{
-		SDL_Window *window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
-		if(NULL == window)
-		{
-			fprintf(stderr, "Error: with SDL2 window creation \"%s\"\n", SDL_GetError());
-			return -2;
-		}
-		else
-		{
-			SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-			if(NULL == renderer)
-			{
-				fprintf(stderr, "Error: with SDL2 renderer creation \"%s\"\n", SDL_GetError());
-				return -3;	
-			}
-			else
-			{
-				SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, WIDTH, HEIGHT);
-				if(NULL == texture)
-				{
-					fprintf(stderr, "Error: with SDL2 texture creation \"%s\"\n", SDL_GetError());
-					return -4;	
-				}
-				else
-				{
-					/* allocate memory for an image */
-					u32 *image = malloc(sizeof(u32) * WIDTH * HEIGHT);
+		fprintf(stderr, "Error: with SDL2 window creation \"%s\"\n", SDL_GetError());
+		return -2;
+	}
 
-					/* generate image */
-					generate_image(image);
-					
-					/*  main loop */
-					bool quit = false;
-					while(!quit)
+	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if(NULL == renderer)
+	{
+		fprintf(stderr, "Error: with SDL2 renderer creation \"%s\"\n", SDL_GetError());
+		return -3;	
+	}
+
+	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, WIDTH, HEIGHT);
+	if(NULL == texture)
+	{
+		fprintf(stderr, "Error: with SDL2 texture creation \"%s\"\n", SDL_GetError());
+		return -4;	
+	}
+
+	/* allocate memory for an image */
+	u32 *image = malloc(sizeof(u32) * WIDTH * HEIGHT);
+
+	/* generate image */
+	generate_image(image);		
+
+	/*  main loop */
+	bool quit = false;
+	while(!quit)
+	{
+					/* check for a quit event */
+		{
+			SDL_Event event = { 0 };
+			if(SDL_PollEvent(&event))
+				switch (event.type)
+				{
+					case SDL_QUIT:
 					{
-						/* check for a quit event */
-						{
-							SDL_Event event = { 0 };
-							if(SDL_PollEvent(&event))
-								switch (event.type)
-								{
-									case SDL_QUIT:
-									{
-										quit = true;
-									} break;
-								}
-						}
-
-						/* draw texture */
-						{
-							SDL_UpdateTexture(texture, NULL, image, sizeof(u32) * WIDTH);
-							SDL_RenderCopy(renderer, texture, NULL, NULL);
-							SDL_RenderPresent(renderer);
-						}
-						
-					}
-
-					/* success */
-					return 0;
+						quit = true;
+					} break;
 				}
-			}
+		}
+		/* draw texture */
+		{
+			SDL_UpdateTexture(texture, NULL, image, sizeof(u32) * WIDTH);
+			SDL_RenderCopy(renderer, texture, NULL, NULL);
+			SDL_RenderPresent(renderer);
 		}
 	}
+
+	/* success */
+	return 0;
 }
