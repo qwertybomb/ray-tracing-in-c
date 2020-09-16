@@ -14,7 +14,7 @@
 
 /* constants */
 #define ASPECT_RATIO (3.0f/ 2.0f)
-enum { WIDTH = 720, HEIGHT = (i32)(WIDTH / ASPECT_RATIO) };
+enum { WIDTH = 500, HEIGHT = (i32)(WIDTH / ASPECT_RATIO) };
 enum { SAMPLES_PER_PIXEL = 25 };
 
 /* main project headers */
@@ -23,6 +23,7 @@ enum { SAMPLES_PER_PIXEL = 25 };
 #include "hittable.h"
 #include "hittable_list.h"
 #include "sphere.h"
+/* TODO: figure out how render triangles without floating point errors */
 #include "material.h"
 
 internal float3 ray_color(ray const *r, hittable const *world, i32 depth)
@@ -113,7 +114,7 @@ internal void generate_image(u32 *image)
 	float3 lookat = {0, 0, 0};
 	float3 vup = {0, 1, 0};
 	float dist_to_focus = 10.0f;
-	float aperture = 0.1f;
+	float aperture = 0.0f;
 	
 	/* NOTE: I don't know why I have to do this but it works */
 	MAKE_OPENMP(camera, cam, make_camera(lookfrom, lookat, vup, 20, ASPECT_RATIO, aperture, dist_to_focus));

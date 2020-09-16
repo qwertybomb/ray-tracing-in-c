@@ -1,6 +1,6 @@
 cc = clang
 flags = -Wall -Ofast -fopenmp -march=native
-linker_flags = -lmingw32 -lSDL2main -lSDL2 -lomp random.o 
+linker_flags = -lSDL2 -lomp random.o 
 
 cpp = clang++
 cpp_flags = -Wall -Ofast -c
