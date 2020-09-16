@@ -116,8 +116,7 @@ internal void generate_image(u32 *image)
 	float dist_to_focus = 10.0f;
 	float aperture = 0.0f;
 	
-	/* NOTE: I don't know why I have to do this but it works */
-	MAKE_OPENMP(camera, cam, make_camera(lookfrom, lookat, vup, 20, ASPECT_RATIO, aperture, dist_to_focus));
+	camera cam = make_camera(lookfrom, lookat, vup, 20, ASPECT_RATIO, aperture, dist_to_focus);
 
 	/* render */
 	#pragma omp parallel for

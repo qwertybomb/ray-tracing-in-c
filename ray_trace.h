@@ -1,6 +1,5 @@
 #pragma once
 #define PI (3.141592653589f)
-#define MAKE_OPENMP(type, name, ...) static type name; name = (type)__VA_ARGS__;
 
 float random_float(void);
 
