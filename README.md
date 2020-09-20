@@ -1,6 +1,6 @@
 # ray-tracing-in-c
 an implementation of ray-tracing in one weekend using mostly c.
-![image](https://user-images.githubusercontent.com/42456119/93390697-19097d80-f83c-11ea-9abd-757b217ec4e7.png)
+![image](https://user-images.githubusercontent.com/42456119/93691689-0353bc80-fab7-11ea-872c-2576ad95cdc9.png)
 
 to build the program on windows use ```
 nmake``` or ```make```
