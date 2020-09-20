@@ -12,7 +12,7 @@ internal inline void write_pixel(u32 *pixel, float3 color, i32 sample_count)
 		color[1] = sqrt(color[1]);
 		color[2] = sqrt(color[2]);
 	}
-	*pixel = ((i32)(color[0] * 255.999f) << 24) | ((i32)(color[1] * 255.999f) << 16) | ((i32)(color[2] * 255.999f) << 8); 
+	*pixel = ((u32)(fminf(color[0] * 255.0f + 0.5555f, 255.999f)) << 24) | ((u32)(fminf(color[1] * 255.0f + 0.5555f, 255.999f)) << 16) | ((u32)(fminf(color[2] * 255.0f + 0.5555f, 255.999f)) << 8);
 }
 
 internal inline size_t index_at(size_t x, size_t y, size_t width)

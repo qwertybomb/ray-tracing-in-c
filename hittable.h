@@ -7,6 +7,7 @@ typedef struct hit_record
 	float3 normal;
 	material *mat_ptr;
 	float t;
+	float2 uv;
 	bool front_face;
 } hit_record;
 
@@ -20,7 +21,8 @@ struct hittable;
 
 struct hittable_vtable
 {
-	bool(*hit)(struct hittable const *this, ray const *r, float t_min, float t_max, hit_record* rec);	
+	bool(*hit)(struct hittable const *this, ray const *r, float t_min, float t_max, hit_record* rec);
+	bool(*bounding_box)(struct hittable const *this, float t0, float t1, aabb *output_box);	
 };
 
 /* an abstract class */

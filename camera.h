@@ -8,6 +8,7 @@ typedef struct camera
 	float3 lower_left_corner;
 	float3 u, v, w;
 	float lens_radius;
+	float time0, time1;
 } camera;
 
 internal inline ray camera_get_ray(camera const *this, float s, float t)
@@ -17,11 +18,12 @@ internal inline ray camera_get_ray(camera const *this, float s, float t)
 
 	return (ray){
 		this->origin + offset,
-		this->lower_left_corner + s * this->horizontal + t * this->vertical - this->origin - offset
+		this->lower_left_corner + s * this->horizontal + t * this->vertical - this->origin - offset,
+		randomf(this->time0, this->time1)
 	};
 }
 
-internal camera make_camera(float3 lookfrom, float3 lookat, float3 vup, float fov, float aspect_ratio, float aperture, float focus_dist)
+internal camera make_camera(float3 lookfrom, float3 lookat, float3 vup, float fov, float aspect_ratio, float aperture, float focus_dist, float t0, float t1)
 {
 	float theta = degrees_to_radians(fov);
 	float h = tanf(theta / 2);
@@ -39,7 +41,9 @@ internal camera make_camera(float3 lookfrom, float3 lookat, float3 vup, float fo
 		.horizontal = focus_dist * viewport_width * u,
 		.vertical= focus_dist * viewport_height * v,
 		.lower_left_corner = result.origin - result.horizontal / 2 - result.vertical / 2 - w * focus_dist,
-		.lens_radius = aperture / 2
+		.lens_radius = aperture / 2,
+		.time0 = t0,
+		.time1 = t1
 	};
 
 	return result;		
