@@ -11,8 +11,8 @@ to build the program on linux use ```make Makefile.nix```
 - spheres
 - materials (metal, lambertian, dielectric)
 - basic multi-threading with OPENMP
+- bvh-node optimization 
 
 # todo
 - triangles/meshs
-- bounding boxes
 - other primative objects
