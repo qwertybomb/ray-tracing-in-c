@@ -59,21 +59,18 @@ internal bool sphere_bounding_box(sphere const *this, float t0, float t1, aabb *
 	return true;
 }
 
-hittable *new_sphere(float3 center, float radius, void *m)
+sphere make_sphere(float3 center, float radius, material *m)
 {
-	sphere *result = malloc(sizeof(sphere));
+    /* setup vtable */
+    static struct hittable_vtable sphere_vtable = {
+        .hit = (void*)&sphere_hit,
+        .bounding_box = (void*)&sphere_bounding_box
+    };
 
-	/* assign the function paremeters to their respective struct members */
-	result->center = center;
-	result->radius = radius;
-	result->mat_ptr = m;
-	
-	/* setup vtable */
-	static struct hittable_vtable sphere_vtable = {
-		.hit = (void*)&sphere_hit,
-		.bounding_box = (void*)&sphere_bounding_box
+    return (sphere) {
+	    .center = center,
+	    .radius = radius,
+	    .mat_ptr = m,
+	    .parent.vtable = &sphere_vtable
 	};
-	result->parent.vtable = &sphere_vtable;
-
-	return (void*)result;
 }

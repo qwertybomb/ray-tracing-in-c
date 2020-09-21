@@ -1,3 +1,4 @@
+#pragma once
 typedef struct moving_sphere
 {
 	hittable parent;

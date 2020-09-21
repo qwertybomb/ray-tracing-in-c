@@ -99,8 +99,8 @@ internal hittable *new_xz_rect(float x0, float x1, float z0, float z1, float k, 
 
     /* setup vtable */
     static struct hittable_vtable xz_rect_vtable = {
-        .hit = (void*)&xz_rect_hit,
-        .bounding_box = (void*)&xz_rect_bounding_box
+        .hit = (void *) &xz_rect_hit,
+        .bounding_box = (void *) &xz_rect_bounding_box
     };
     result->parent.vtable = &xz_rect_vtable;
     return (void*)result;
@@ -153,7 +153,7 @@ internal hittable *new_yz_rect(float y0, float y1, float z0, float z1, float k, 
     /* setup vtable */
     static struct hittable_vtable yz_rect_vtable = {
         .hit = (void*)&yz_rect_hit,
-        .bounding_box = (void*)&yz_rect_bounding_box
+        .bounding_box = (void*)&yz_rect_bounding_box,
     };
     result->parent.vtable = &yz_rect_vtable;
     return (void*)result;

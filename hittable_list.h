@@ -79,20 +79,18 @@ bool hittable_list_bounding_box(hittable_list const *this, float t0, float t1, a
 }
 
 
-__attribute__((overloadable)) internal hittable *new_hittable_list(void)
+__attribute__((overloadable)) internal hittable_list make_hittable_list(void)
 {
-	hittable_list *result = calloc(1, sizeof(hittable_list));
 	static struct hittable_vtable hittable_list_vtable = { 
 		.hit = (void*)&hittable_list_hit,
 		.bounding_box = (void*)&hittable_list_bounding_box
 	};
-	result->parent.vtable = &hittable_list_vtable;
-	return (void*)result;		
+    return (hittable_list){ .parent.vtable = &hittable_list_vtable };
 }
 
-__attribute__((overloadable)) internal hittable *new_hittable_list(void *object)
+__attribute__((overloadable)) internal hittable_list make_hittable_list(void *object)
 {
-	hittable_list *result = (void*)new_hittable_list();
-	hittable_list_add(result, object);
-	return (void*)result;		
+	hittable_list result = make_hittable_list();
+	hittable_list_add(&result, object);
+	return result;
 }

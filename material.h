@@ -1,4 +1,3 @@
-
 #pragma once
 struct material;
 
@@ -19,21 +18,26 @@ internal float3 material_emitted(material const *this, float2 uv, float3 p)
     return 0;
 }
 
+internal bool material_scatter(material const *this, ray const *r_in, hit_record const *rec, float3 *attenuation, ray *scattered)
+{
+    return false;
+}
+
 typedef struct lambertian
 {
 	material parent;
 	texture *albedo;
 } lambertian;
 
-bool lambertian_scatter(lambertian const *this, ray const *r_in, hit_record const *rec, float3 *attenuation, ray *scattered)
+internal bool lambertian_scatter(lambertian const *this, ray const *r_in, hit_record const *rec, float3 *attenuation, ray *scattered)
 {
-	float3 scatter_dir = rec->normal + random_unit_vector();
-	*scattered = (ray){rec->p, scatter_dir, r_in->time};
+	float3 scatter_direction = rec->normal + random_in_unit_sphere();
+	*scattered = (ray){rec->p, scatter_direction, r_in->time};
 	*attenuation = this->albedo->vtable->value(this->albedo, rec->uv, rec->p);
 	return true;
 }
 
-__attribute__((overloadable)) material *new_lambertian(texture *color)
+__attribute__((overloadable)) internal material *new_lambertian(texture *color)
 {
 	lambertian *result = malloc(sizeof(lambertian));
 	result->albedo = color;
@@ -46,7 +50,7 @@ __attribute__((overloadable)) material *new_lambertian(texture *color)
 	return (void*)result;
 }
 
-__attribute__((overloadable)) material *new_lambertian(float3 color)
+__attribute__((overloadable)) internal material *new_lambertian(float3 color)
 {
 	return new_lambertian(new_solid_color(color));
 }
@@ -58,7 +62,7 @@ typedef struct metal
 	float fuzz;
 } metal;
 
-bool metal_scatter(metal const *this, ray const *r_in, hit_record const *rec, float3 *attenuation, ray *scattered)
+internal bool metal_scatter(metal const *this, ray const *r_in, hit_record const *rec, float3 *attenuation, ray *scattered)
 {
 	float3 reflected = reflect(normalize(r_in->dir), rec->normal);
 	*scattered = (ray){rec->p, reflected + this->fuzz * random_in_unit_sphere()};
@@ -66,7 +70,7 @@ bool metal_scatter(metal const *this, ray const *r_in, hit_record const *rec, fl
 	return (dot(scattered->dir, rec->normal) > 0);
 }
 
-material *new_metal(float3 color, float fuzz)
+internal material *new_metal(float3 color, float fuzz)
 {
 	metal *result = malloc(sizeof(metal));
 	result->albedo = color;
@@ -93,7 +97,7 @@ internal inline float schlick(float cosine, float ref_idx)
 	return r0 + (1 - r0) * powf(1 - cosine, 5);
 }
 
-bool dielectric_scatter(dielectric const *this, ray const *r_in, hit_record const *rec, float3 *attenuation, ray *scattered)
+internal bool dielectric_scatter(dielectric const *this, ray const *r_in, hit_record const *rec, float3 *attenuation, ray *scattered)
 {
 	*attenuation = 1.0f;
 	float etai_over_etat = rec->front_face ? 1.0f / this->ref_idx : this->ref_idx;
@@ -123,7 +127,7 @@ bool dielectric_scatter(dielectric const *this, ray const *r_in, hit_record cons
 	return true;
 }
 
-material *new_dielectric(float ref_idx)
+internal material *new_dielectric(float ref_idx)
 {
 	dielectric *result = malloc(sizeof(dielectric));
 	result->ref_idx = ref_idx;
@@ -142,14 +146,9 @@ typedef struct diffuse_light
 	texture *emit;
 } diffuse_light;
 
-internal bool diffuse_light_scatter(material const *this, ray const *r_in, hit_record const *rec, float3 *attenuation, ray *scattered)
-{
-	return false;
-}
-
 internal float3 diffuse_light_emitted(diffuse_light const *this, float2 uv, float3 p)
 {
-	return this->emit->vtable->value(this->emit, uv, p);	
+    return this->emit->vtable->value(this->emit, uv, p);
 }
 
 __attribute__((overloadable)) internal material *new_diffuse_light(texture *a)
@@ -159,7 +158,7 @@ __attribute__((overloadable)) internal material *new_diffuse_light(texture *a)
 
 	/* setup vtable */
 	static struct material_vtable diffuse_light_vtable = {
-		.scatter = &diffuse_light_scatter,
+		.scatter = &material_scatter,
 		.emitted = (void*)&diffuse_light_emitted
 	};
 	result->parent.vtable = &diffuse_light_vtable;
@@ -170,4 +169,32 @@ __attribute__((overloadable)) internal material *new_diffuse_light(texture *a)
 __attribute__((overloadable)) internal material *new_diffuse_light(float3 c)
 {
 	return new_diffuse_light(new_solid_color(c));
+}
+
+typedef struct isotropic
+{
+    material parent;
+    texture *albedo;
+} isotropic;
+
+internal bool isotropic_scatter(isotropic const *this, ray const *r, hit_record const *rec, float3 *attenuation, ray *scattered)
+{
+    *scattered = (ray){rec->p, random_in_unit_sphere(), r->time};
+    *attenuation = this->albedo->vtable->value(this->albedo, rec->uv, rec->p);
+    return true;
+}
+
+__attribute__((overloadable)) internal material *new_isotropic(texture *a)
+{
+    isotropic *result = malloc(sizeof(isotropic));
+    result->albedo = a;
+
+    /* setup vtable */
+    static struct material_vtable isotropic_vtable = {
+        .scatter = (void*)&isotropic_scatter,
+        .emitted = &material_emitted
+    };
+    result->parent.vtable = &isotropic_vtable;
+
+    return (void*)result;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #define PI (3.141592653589f)
+#define new(type, ...) ({type *$$$$ = malloc(sizeof(type)); *$$$$ = make_##type(__VA_ARGS__); (void*)$$$$;})
 
 float random_float(void);
 
