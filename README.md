@@ -1,6 +1,6 @@
 # ray-tracing-in-c
 an implementation of ray-tracing in one weekend using mostly c.
-![image](https://user-images.githubusercontent.com/42456119/93691689-0353bc80-fab7-11ea-872c-2576ad95cdc9.png)
+![image](https://user-images.githubusercontent.com/42456119/93826728-e0034b80-fc35-11ea-8e00-d6c661c69a37.png)
 
 to build the program on windows use ```
 nmake``` or ```make```
@@ -11,9 +11,9 @@ nmake``` or ```make```
 - diffuse lights
 - basic multi-threading with OPENMP
 - bvh-node optimization 
+- volumes
 
 # todo
 - maybe simd
-- volumes
 - triangles/meshs
 - other primative objects
