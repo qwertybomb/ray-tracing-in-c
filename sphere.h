@@ -1,3 +1,4 @@
+#pragma once
 typedef struct sphere
 {
 	hittable parent;
